@@ -1,5 +1,6 @@
 # File Management
-## open file
+https://www.youtube.com/watch?v=ve2pmm5JqmI&list=PL-osiE80TeTt2d9bfVyTiXJA-UTHn6WwU&index=26
+## Open Files
 
 `f = open('test.txt', 'r')`
 
@@ -98,3 +99,33 @@ with open('picture.jpg', 'rb') as rf:
       rf_chunk - rf.read(chunk_size)      
 ```  
 
+## Parse and rename files
+Original file format:
+title-course-number
+
+```
+import os # for file manipulation
+
+os.chdir('path/to/folder')
+
+print(os.getcwd()) # get current working directory
+
+for f in os.listdir():
+  print(f) # list files
+  print(os.path.splitext(f)) # generates a tuple with filename, fileextension
+  
+  file_name, file_ext = os.path.splitext(f)
+  print(file_name)
+  print(file_ext)
+  
+  print(file_name.split('-') # split a string into chunks using - as separator
+  
+  f_title = f_title.strip # trim spaces  
+  f_num = f_num[1:] # skip the first character
+  f_num = f_num.zfill(2) # pad integer so it is sortable
+  
+  new_name = ('{}-{}-{}{}'.format(f_num,f_cource_f_title_,f_ext)
+  
+  os.rename.(f, new_name) # rename
+  
+  
