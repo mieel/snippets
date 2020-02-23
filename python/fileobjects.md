@@ -112,20 +112,20 @@ print(os.getcwd()) # get current working directory
 
 for f in os.listdir():
   print(f) # list files
-  print(os.path.splitext(f)) # generates a tuple with filename, fileextension
+  print(os.path.splitext(f))              # generates a tuple with filename, fileextension
   
   file_name, file_ext = os.path.splitext(f)
   print(file_name)
   print(file_ext)
   
-  print(file_name.split('-') # split a string into chunks using - as separator
+  print(file_name.split('-')              # split a string into chunks using - as separator
   
   f_title = f_title.strip # trim spaces  
-  f_num = f_num[1:] # skip the first character
-  f_num = f_num.zfill(2) # pad integer so it is sortable
+  f_num = f_num[1:]                       # skip the first character
+  f_num = f_num.zfill(2)                  # pad integer so it is sortable
   
   new_name = ('{}-{}-{}{}'.format(f_num,f_cource_f_title_,f_ext)
   
-  os.rename.(f, new_name) # rename
+  os.rename.(f, new_name)                 # rename
   
   
