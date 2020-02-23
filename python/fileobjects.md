@@ -58,3 +58,18 @@ print(f.closed)
 
 print(f.read) # should print error because file is closed
 ```
+## Writing files
+### basic write
+`with open('test2.txt','w') as f: # use 'a' to append instead of write
+  f.write('Test')`
+### create empty file
+`with open('test2.txt','w') as f:
+  pass`
+## Read and write
+```
+with open('test', 'r') as rf:
+  with open('test_copy.txt', 'w') as wf: # you can put this on the same line, but is better readable
+    for line in rf:
+      wf.write(line)
+```     
+    
