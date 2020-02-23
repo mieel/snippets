@@ -1,4 +1,4 @@
-#File Management
+# File Management
 ## open file
 
 `f = open('test.txt', 'r')`
@@ -7,6 +7,7 @@
 
 `f.close() #close file when done!`
 ### using context manager
+Context manager automatically closes the file after a block
 ```
 with open ('test.txt','r') as f:
   f_contents = f.read() # Read entire file
