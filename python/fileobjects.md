@@ -72,4 +72,28 @@ with open('test', 'r') as rf:
     for line in rf:
       wf.write(line)
 ```     
-    
+### Picture files
+```
+with open('picture.jpg', 'r') as rf:
+  with open('picture.jpg', 'w') as wf: # you can put this on the same line, but is better readable
+    for line in rf:
+      wf.write(line)
+```   
+This does not work, we to open binary `b`
+```
+with open('picture.jpg', 'rb') as rf:
+  with open('picture.jpg', 'wb') as wf: # you can put this on the same line, but is better readable
+    for line in rf:
+      wf.write(line)
+```   
+In chunks
+```
+with open('picture.jpg', 'rb') as rf:
+  with open('picture.jpg', 'wb') as wf: # you can put this on the same line, but is better readable
+    chunk_size = 4096
+    rf_chunk = rf.read(chunk_size)
+    while len(rf_chunk) > 0:
+      wf.write(rf_chunk)
+      rf_chunk - rf.read(chunk_size)      
+```  
+
