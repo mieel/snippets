@@ -72,8 +72,8 @@ dt_eat = dt_mtn.astimezone(pytz.timezone('US/Estern')) # now we can convert
 ## Date Strings
 ```
 print(dt.isoformat())                           # look online for formatting codes
-print(strftime(dt, '%B %d, %Y')                # 'July 26, 2016'
+print(strftime(dt, '%B %d, %Y')                 # Format to string 'July 26, 2016'
 
 dt_str = 'July 26, 2016'
-dt = datetime.datetime.strptime(dt, '%B %d, %Y') # back to date
+dt = datetime.datetime.strptime(dt, '%B %d, %Y') # Parse back to date
 ```
