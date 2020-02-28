@@ -1,3 +1,5 @@
+Generator functions allow you to declare a function that behaves like an iterator, i.e. it can be used in a for loop.
+
 ```
 def square_number(nums):
     for i in nums:
@@ -30,3 +32,4 @@ for num in my_nums:
     print num
 ```
 Generators are good for performance because not all the values are stored in memory at a time
+And are more readable
