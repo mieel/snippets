@@ -35,3 +35,20 @@ finally:                      # this bit will always run,even when exceptions
   print('execute finally')
   # close db etc...
 ```
+Custom Exceptions
+```
+try:
+  f = open('testfile.txt')
+  if f.name == 'bad file'
+    raise Exception
+except FileNotFoundError e:
+  print(e)
+except Exception as e:
+  print(e)
+else:
+  print(f.read())             # execute if no exceptions occured
+  f.close()
+finally:                      # this bit will always run,even when exceptions
+  print('execute finally')
+  # close db etc...
+```
