@@ -26,6 +26,12 @@ try:
   f = open('testfile.txt')
 except FileNotFoundError e:
   print(e)
-except Exception as e::
+except Exception as e:
   print(e)
+else:
+  print(f.read())             # execute if no exceptions occured
+  f.close()
+finally:                      # this bit will always run,even when exceptions
+  print('execute finally')
+  # close db etc...
 ```
