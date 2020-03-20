@@ -1,0 +1,42 @@
+
+Import-Module Az
+$ResourceGroup = ''
+$StorageAccountName = ""
+
+$ContainerName = "filerepo"
+$appid = ''
+$secret = ''
+$dir = ''
+
+$password = $secret | ConvertTo-SecureString -asPlainText -Force
+$Credential = New-Object System.Management.Automation.PSCredential($appId, $password)
+
+# Start Process
+Connect-AzAccount -Credential $Credential -Tenant $dir -ServicePrincipal
+$ctx = (Get-AzStorageAccount -ResourceGroupName $ResourceGroup -Name $StorageAccountName).Context
+
+
+## Upload a file  
+$path = 'F:\Fileserver\Path'
+$files = gci $path
+$files | Foreach-object {
+    $file = Get-Item $_.fullname
+    Set-AzStorageBlobContent -Container $ContainerName -File $_.FullName -Blob $_.Name -Context $ctx -Force      
+}
+
+
+## Get all files
+Get-AzStorageBlob -Container $ContainerName -Context $ctx | fl
+## by filter
+Get-AzStorageBlob -Container $ContainerName -Context $ctx -Blob '*wilcard*'
+
+$files = Get-AzStorageBlob -Container $ContainerName -Context $ctx -Prefix 'Prefix'
+
+# Download file and save
+Get-AzStorageBlobContent -Container $ContainerName -Blob 'blob name' -Context $ctx -Destination F:\temp\test.xml
+
+$content = Get-AzStorageBlobContent -Container $ContainerName -Blob 'blob name' -Context $ctx -Force
+
+# Get first x lines
+$x = 10
+($content.ICloudBlob.DownloadText() -split '\n') | Select-Object -First $x
