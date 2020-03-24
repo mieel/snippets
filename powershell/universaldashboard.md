@@ -1,5 +1,62 @@
 # Universal Dashboard Snippets
 ## to start a Dashboard in IIS
+Create a content file that will create the dashboard elements
+<details>
+    <summary>dashboard-content.ps1</summary>
+        
+```
+Param (
+    [switch]
+    $LocalConfig
+)
+# Use a local web.config to test locally
+$WebConfig = 'web.config'
+If ( $LocalConfig ) {
+    $WebConfig = 'web.config.local'
+}
+#Set Cache variables
+# See next section: Config Values
+...
+
+# local modules 
+$EndPointInitModules = @()
+
+# default Toast Parameters
+$ToastParams = @{
+    Duration     = 5000
+    ReplaceToast = $True
+    Position     = 'bottomRight'
+    Theme        = 'dark'
+}
+
+# Load Functions and Pages
+## functions are loaded into the session
+Get-ChildItem $Cache:WebRoot/functions | Where-Object { $_.FullName -like '*.ps1' } | ForEach-Object { . "$($_.FullName)" }
+## pages and navigation are loaded into variables
+$Pages = Get-ChildItem $Cache:WebRoot/pages -Recurse | Where-Object { $_.FullName -like '*.Page.ps1' } | Sort-Object { $_.Name } | ForEach-Object { . "$($_.FullName)" }
+$Navigation = . "$Cache:WebRoot/pages/elements/Sidebar.Navigation.ps1"
+
+# Expose Folders
+$Cache:UDFolders = Publish-UDFolder -Path $Cache:WorkingDirectoryPath -RequestPath "/share"
+
+# Endpoint Inititialization
+$EndPointInit = New-UDEndpointInitialization -Module @(
+    $EndPointInitModules
+) -Variable @(
+    'ToastParams'
+) -Function @(
+    @($ListofFunctions)
+)
+
+# Outputting the Dashboard object (to be used in a Start-UDDashboard cmdlet)
+
+New-UDDashboard -Title "Dashboard" -Pages $Pages -EndpointInitialization $EndPointInit -Navigation $Navigation
+
+```
+
+</details>
+
+When using IIS this file will be used to boot the Dashboard
 <details>
     <summary>dashboard.ps1</summary>
         
