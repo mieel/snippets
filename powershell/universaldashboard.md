@@ -1,7 +1,7 @@
 # Universal Dashboard Snippets
 ## to start a Dashboard in IIS
 <details>
-    <summary>dashboard.ps1<\summary>
+    <summary>dashboard.ps1</summary>
         
 ```
 $Dashboard = . "$PSScriptRoot\dashboard-content.ps1"
@@ -17,6 +17,7 @@ If ($Cache:UDFolders) {
 
 Start-UDDashboard @DashParams
 ```
+
 </details>
 ## Read Config values from web.config
 <details>
@@ -34,8 +35,12 @@ $KeyPairs | ForEach-Object {
     New-Variable -Name $_.Key -Value $_.Value -Force
 }
 ```
+
 </details>
 ## Page with a Search box and Results grid
+<details>
+    <summary>SearchPage.ps1</summary>
+    
 ```
 New-UDPage -Name "Search" -Icon box -Content {
     New-UDInput -Title "Search Something 📝" -Id "webdivSearchForm" -Content {
@@ -67,6 +72,8 @@ New-UDPage -Name "Search" -Icon box -Content {
 
 }
 ```
+
+</details>
 ## Functions to convert an object into a UDTable
 <details>
     <summary>Get-PropertiesAsObjects</summary>
