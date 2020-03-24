@@ -1,5 +1,8 @@
 # Universal Dashboard Snippets
 ## to start a Dashboard in IIS
+<details>
+    <summary>dashboard.ps1<\summary>
+        
 ```
 $Dashboard = . "$PSScriptRoot\dashboard-content.ps1"
 $DashParams = @{
@@ -14,7 +17,11 @@ If ($Cache:UDFolders) {
 
 Start-UDDashboard @DashParams
 ```
+</details>
 ## Read Config values from web.config
+<details>
+    <summary>read config values</summary>
+    
 ```
 # Reads web.config, creates an Appsettings hashtable
 # and creates individual variables of each keypair
@@ -27,6 +34,7 @@ $KeyPairs | ForEach-Object {
     New-Variable -Name $_.Key -Value $_.Value -Force
 }
 ```
+</details>
 ## Page with a Search box and Results grid
 ```
 New-UDPage -Name "Search" -Icon box -Content {
