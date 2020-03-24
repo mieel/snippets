@@ -103,7 +103,7 @@ $KeyPairs | ForEach-Object {
     
 ```
 New-UDPage -Name "Search" -Icon box -Content {
-    New-UDInput -Title "Search Something 📝" -Id "webdivSearchForm" -Content {
+    New-UDInput -Title "Search Something 📝" -Id "inputSearchForm" -Content {
         New-UDInputField -Type 'textbox' -Name 'SearchString' -Placeholder 'Search'       
     } -Endpoint {
         param(
