@@ -59,10 +59,10 @@ New-UDPage -Name "Search" -Icon box -Content {
 
 }
 ```
-## Function to convert an object into a UDTable
+## Functions to convert an object into a UDTable
 <details>
+    <summary>Get-PropertiesAsObjects</summary>
 ```
-<summary>Get-PropertiesAsObjects</summary>
 Function Get-PropertiesAsObjects {
     [cmdletbinding()]
     Param (
