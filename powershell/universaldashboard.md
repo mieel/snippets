@@ -19,6 +19,7 @@ Start-UDDashboard @DashParams
 ```
 
 </details>
+
 ## Read Config values from web.config
 <details>
     <summary>read config values</summary>
@@ -37,7 +38,9 @@ $KeyPairs | ForEach-Object {
 ```
 
 </details>
+
 ## Page with a Search box and Results grid
+
 <details>
     <summary>SearchPage.ps1</summary>
     
@@ -74,7 +77,9 @@ New-UDPage -Name "Search" -Icon box -Content {
 ```
 
 </details>
+
 ## Functions to convert an object into a UDTable
+
 <details>
     <summary>Get-PropertiesAsObjects</summary>
     
