@@ -1,0 +1,27 @@
+## This shows how to loop over a dictionaty, looking up each value in a second dictionary (like a sql inner join)
+
+- name: test
+  hosts: localhost
+  vars:
+    cname:
+      a.domain.com: "server1.com"
+      b.domain.com: "server2.com"
+      c.domain.com: "server3.com"
+    arecord:
+      server1.com: "10.10.10.1"
+      server2.com: "10.10.10.2"
+      server3.com: "10.10.10.3"
+  tasks:
+    - name: print cname
+      debug:
+        var: cname
+
+    - name: print arecord
+      debug:
+        var: arecord
+
+    - name: display mapped
+      debug:
+        msg: "{{ item.key }} points to {{ item.value }} has IP: {{ arecord[item.value] }} "
+      loop: "{{ lookup('dict', cname) }}"
+
