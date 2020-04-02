@@ -69,7 +69,7 @@ Function Invoke-CronIncrement {
         'Minute' { $date.AddMinutes(1)} 
         'Hour' { $date.AddHours(1) }
         'Day' { $date.AddDays(1) }
-        'Month' { $date.AddMonth(1) }
+        'Month' { $date.AddMonths(1) }
     }
     $output = [ordered]@{
         Minute  = $date.Minute
@@ -90,11 +90,12 @@ Function Get-CronNextExecutionTime {
             Get-CronNextExecutionTime -Expression '* * * * *'
             Get-CronNextExecutionTime -Expression '5 * * * *'
             Get-CronNextExecutionTime -Expression '* 13-21 * * *'
+            Get-CronNextExecutionTime -Expression '0 0 2 * *'
             Get-CronNextExecutionTime -Expression '15 14 * 1-3 *'
             Get-CronNextExecutionTime -Expression '15 14 * * 4'
             Get-CronNextExecutionTime -Expression '15 14 * 2 *'
-            Get-CronNextExecutionTime -Expression '15 14 * * *'
-            Get-CronNextExecutionTime -Expression '15 14 * * 1-2'
+            Get-CronNextExecutionTime -Expression '15 14-20 * * *'
+            Get-CronNextExecutionTime -Expression '15 14 * * 1'
     #>
     [cmdletbinding()]
     param(
@@ -161,6 +162,15 @@ Function Get-CronNextExecutionTime {
                 $next.Hour = 0
                 $next.Minute = 0
             } While ((Test-CronRange -InputValue $next.Month -range $cronMonth)-eq $False)
+            continue
+        }
+        If ((Test-CronRange -InputValue $Next.WeekDay -Range $cronWeekday) -eq $false) {
+            Do {
+                $next = Invoke-CronIncrement -DateTable $Next -Increment Day
+                $next.Hour = 0
+                $next.Minute = 0    
+            } While ( (Test-CronRange -InputValue  $Next.WeekDay -Range $cronWeekday) -eq $false )
+            continue
         }
         $done = $true
     } While ($done -eq $false)
@@ -168,11 +178,7 @@ Function Get-CronNextExecutionTime {
     If (!$date) { Throw 'Could not create date'}
     
     # Add Days until weekday matches
-    If ((Test-CronRange -InputValue $Date.DayOfWeek.value__ -Range $cronWeekday) -eq $false) {
-        Do {
-            $Date = $Date.AddDays(1)                
-        } While ( (Test-CronRange -InputValue $Date.DayOfWeek.value__ -Range $cronWeekday) -eq $false )
-    }
+ 
     Return $Date
 }
 
