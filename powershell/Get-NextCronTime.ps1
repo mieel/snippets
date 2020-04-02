@@ -47,6 +47,40 @@ Function Test-CronRange {
     }    
     Write-Error "Could not process Range format: $Range"
 }
+Function ConvertFrom-DateTable {
+    Param (
+        $DateTable
+    )
+    $datestring = "{0}-{1:00}-{2:00} {3:00}:{4:00}" -f $DateTable.year, $DateTable.month, $DateTable.day, $DateTable.hour, $DateTable.Minute
+    $date = [datetime]::ParseExact($datestring,"yyyy-MM-dd HH:mm",$null)
+    return $date
+}
+Function Invoke-CronIncrement {
+    param(
+        [psobject]
+        $DateTable
+        ,
+        [ValidateSet('Minute','Hour','Day','Month')]
+        [string]
+        $Increment
+    )
+    $date = ConvertFrom-DateTable -DateTable $DateTable
+    $date = switch ($Increment) {
+        'Minute' { $date.AddMinutes(1)} 
+        'Hour' { $date.AddHours(1) }
+        'Day' { $date.AddDays(1) }
+        'Month' { $date.AddMonth(1) }
+    }
+    $output = [ordered]@{
+        Minute  = $date.Minute
+        Hour    = $date.hour
+        Day     = $date.day
+        Weekday = $date.DayOfWeek.value__
+        Month   = $date.month
+        Year    = $date.year
+    }
+    Return $output
+}
 Function Get-CronNextExecutionTime {
     <#
         .SYNOPSIS
@@ -96,11 +130,7 @@ Function Get-CronNextExecutionTime {
     Do {
         If ((Test-CronRange -InputValue $next.Minute -range $cronMinute)-eq $False) {
             Do {
-                $next.Minute++
-                If ($next.Minute -gt '60') { 
-                    $next.Minute = 0
-                    $next.Hour++
-                }
+                $next = Invoke-CronIncrement -DateTable $Next -Increment Minute
             } While ( (Test-CronRange -InputValue $next.Minute -range $cronMinute) -eq $False )
             continue
         }
@@ -108,12 +138,8 @@ Function Get-CronNextExecutionTime {
         # Add a Day because the desired Hour has already passed
         If ((Test-CronRange -InputValue $next.Hour -range $cronHour)-eq $False) {
             Do {
-                $next.Hour++
-                If ($next.Hour -gt '24') { 
-                    $next.Hour = 0
-                    $next.Day++
-                    $next.Minute = 0
-                }
+                $next = Invoke-CronIncrement -DateTable $Next -Increment Hour
+                $next.Minute = 0                
             } While ((Test-CronRange -InputValue $next.Hour -range $cronHour)-eq $False)
             continue
         }
@@ -121,13 +147,9 @@ Function Get-CronNextExecutionTime {
         # If Days passes the 30/31 mark, the Month is incremented
         If ((Test-CronRange -InputValue $next.day -range $cronday)-eq $False) {
             Do {
-                $next.Day++
-                If ($next.Day -gt '30') {
-                    $next.Day = 0
-                    $next.Month++
-                    $next.Hour = 0
-                    $next.Minute = 0
-                }
+                $next = Invoke-CronIncrement -DateTable $Next -Increment Day
+                $next.Hour = 0
+                $next.Minute = 0                
             } While ((Test-CronRange -InputValue $next.day -range $cronday)-eq $False)
             continue
         }
@@ -135,20 +157,14 @@ Function Get-CronNextExecutionTime {
         # If Months passes the 12 mark, the Year is incremented    
         If  ((Test-CronRange -InputValue $next.Month -range $cronMonth)-eq $False) {
             Do {
-                $next.Month++
-                If ($next.Month -gt '12') {
-                    $next.Month = 0
-                    $next.Year++
-                    $next.Day = 0
-                    $next.Hour = 0
-                    $next.Minute = 0
-                }
+                $next = Invoke-CronIncrement -DateTable $Next -Increment Month
+                $next.Hour = 0
+                $next.Minute = 0
             } While ((Test-CronRange -InputValue $next.Month -range $cronMonth)-eq $False)
         }
         $done = $true
     } While ($done -eq $false)
-    $datestring = "{0}-{1:00}-{2:00} {3:00}:{4:00}" -f $next.year, $next.month, $next.day, $next.hour, $next.Minute
-    $date = [datetime]::ParseExact($datestring,"yyyy-MM-dd HH:mm",$null)
+    $date = ConvertFrom-DateTable -DateTable $next
     If (!$date) { Throw 'Could not create date'}
     
     # Add Days until weekday matches
