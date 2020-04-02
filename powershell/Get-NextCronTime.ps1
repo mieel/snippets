@@ -54,8 +54,8 @@ Function Get-CronNextExecutionTime {
             todo: add support for ',' '-' '/' ','
         .EXAMPLE
             Get-CronNextExecutionTime -Expression '* * * * *'
-            Get-CronNextExecutionTime -Expression '0 1-15 * * *'
-            Get-CronNextExecutionTime -Expression '15 14 * * *'
+            Get-CronNextExecutionTime -Expression '0 13-15 * * *'
+            Get-CronNextExecutionTime -Expression '15 14 * 1-3 *'
             Get-CronNextExecutionTime -Expression '15 14 * * 4'
             Get-CronNextExecutionTime -Expression '15 14 * 2 *'
             Get-CronNextExecutionTime -Expression '15 14 * * *'
@@ -64,7 +64,7 @@ Function Get-CronNextExecutionTime {
     [cmdletbinding()]
     param(
         [string]
-        $Expression = '1 2 3 4 5'
+        $Expression = '* * * * *'
         ,
         $InputDate
     )
@@ -75,9 +75,7 @@ Function Get-CronNextExecutionTime {
             Try {
                 [int]$newValue = $_.Value
                 Set-Variable -Name $_.Name -Value $newValue -ErrorAction Ignore
-            } Catch {
-
-            }
+            } Catch {}
         }
     }
     # Get the next default Time (= next minute)
@@ -91,77 +89,59 @@ Function Get-CronNextExecutionTime {
         Month   = $nextdate.month
         Year    = $nextdate.year
     }
-    $done = $false
-    $i = 0
-    Do {
-        $i++
-        If($i -gt 1000) { 
-            $datestring = "{0}-{1:00}-{2:00} {3:00}:{4:00}" -f $next.year, $next.month, $next.day, $next.hour, $next.Minute
-            $datestring
-            Throw 'Something is wrong, stuck in loop' 
-        }
-        Write-Debug $("{0}-{1:00}-{2:00} {3:00}:{4:00}" -f $next.year, $next.month, $next.day, $next.hour, $next.Minute)
-        if ($cronMinute -ne '*' -and $next.minute -ne $cronMinute) {
-            if ($next.minute -gt $cron.minute -and ( (Test-CronRange -InputValue $next.hour -range $cronHour) -eq $false) ) {
+    # Increase Minutes until it is in the range.
+    # If Minutes passes the 60 mark, the hour is incremented           
+    If ((Test-CronRange -InputValue $next.Minute -range $cronMinute)-eq $False) {
+        Do {
+            $next.Minute++
+            If ($next.Minute -gt '60') { 
+                $next.Minute = 0
                 $next.Hour++
             }
-            $next.Minute = $cronMinute        
-        }
-        if ($cronHour -ne '*' -and ( (Test-CronRange -InputValue $next.hour -range $cronHour) -eq $false) ) {
-            # Add a Day because the desired Hour has already passed
-            if ((Test-CronRange -InputValue $next.hour -range $cronHour) -eq $false) {
-                Do {
-                    $next.Hour++
-                } While ((Test-CronRange -InputValue $next.hour -range $cronHour)-eq $true)
-                $next.Day++
-                $next.Minute = 0            
-                continue
-            }
+        } While ( (Test-CronRange -InputValue $next.Minute -range $cronMinute) -eq $False )
+    }
+    # Check if the next Hour is in the desired range
+    # Add a Day because the desired Hour has already passed
+    If ((Test-CronRange -InputValue $next.Hour -range $cronHour)-eq $False) {
+        Do {
             $next.Hour++
-            $next.Minute = 0
-            continue
-        }   
-        if ($cronDay -ne '*' -and ( (Test-CronRange -InputValue $next.day -rang $cronDay) -eq $false) ) {
-            # Add a Year if the desired Month already has passed
-            if ($next.day -gt $cronDay) {
-                $next.Month++
-                $next.day = 1 #assume days 1..31
-                $next.hour = 0
-                $next.minute = 0
-                continue
-            }
-            $next.day = $cronDay
-            $next.hour = 0
-            $next.minute = 0
-            continue
-        }
-        if ($cronMonth -ne '*' -and ( (Test-CronRange -InputValue $next.hour -rang $cronHour) -eq $false) ) {
-            if ($next.Month -gt $cronMonth) {
-                $next.Month++
-                $next.Year++
-                $next.Day = 1 # assume days 1..31
+            If ($next.Hour -gt '24') { 
                 $next.Hour = 0
-                $next.Minute = 0
-                continue
+                $next.Day++
             }
-            $next.month = $cronMonth;
-            $next.day = 1
-            $next.hour = 0
-            $next.minute = 0
-            continue
-        }
-        $done = $true
-       
-    } While ($done -eq $false)
+        } While ((Test-CronRange -InputValue $next.Hour -range $cronHour)-eq $False)
+    }
+    # Increase Days until it is in the range.
+    # If Days passes the 30/31 mark, the Month is incremented
+    If ((Test-CronRange -InputValue $next.day -range $cronday)-eq $False) {
+        Do {
+            $next.Day++
+            If ($next.Day -gt '30') {
+                $next.Day = 0
+                $next.Month++
+            }
+        } While ((Test-CronRange -InputValue $next.day -range $cronday)-eq $False)
+    }
+    # Increase Months until it is in the range.
+    # If Months passes the 12 mark, the Year is incremented    
+    If  ((Test-CronRange -InputValue $next.Month -range $cronMonth)-eq $False) {
+        Do {
+            $next.Month++
+            If ($next.Month -gt '30') {
+                $next.Month = 0
+                $next.Year++
+            }
+        } While ((Test-CronRange -InputValue $next.Month -range $cronMonth)-eq $False)
+    }
     $datestring = "{0}-{1:00}-{2:00} {3:00}:{4:00}" -f $next.year, $next.month, $next.day, $next.hour, $next.Minute
     $date = [datetime]::ParseExact($datestring,"yyyy-MM-dd HH:mm",$null)
     If (!$date) { Throw 'Could not create date'}
-    if ($cronWeekday -ne '*') {
-        # Add Days until weekday matches        
+    
+    # Add Days until weekday matches
+    If ((Test-CronRange -InputValue $Date.DayOfWeek.value__ -Range $cronWeekday) -eq $false) {
         Do {
-            $Date = $Date.AddDays(1)
-            $InRange = Test-CronRange -InputValue $Date.DayOfWeek.value__ -Range $cronWeekday            
-        } While ( $InRange -eq $false )
+            $Date = $Date.AddDays(1)                
+        } While ( (Test-CronRange -InputValue $Date.DayOfWeek.value__ -Range $cronWeekday) -eq $false )
     }
     Return $Date
 }
