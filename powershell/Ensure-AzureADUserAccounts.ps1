@@ -1,3 +1,10 @@
+#region Doc
+<#
+	.Synopsis
+		Functions to Ensure AAD Users with auto generating passwords backed in an Azure Key Vault.
+	
+#>
+#endregion
 #region functions 
 Function New-Password {
     $resp = Invoke-RestMethod -uri 'https://makemeapassword.ligos.net/api/v1/pronounceable/json?c=1&sc=3'
