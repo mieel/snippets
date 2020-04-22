@@ -1,0 +1,15 @@
+---
+# Snippet to retrieve secrets from Az Keyvault
+# Prerequisites: https://dev.to/cloudskills/decoupling-ansible-secrets-with-azure-key-vault-2g7l#prerequisites
+- hosts: localhost
+  gather_facts: false
+  connection: local
+  tasks:
+    - name: Look up secret when ansible host is general VM
+      vars:
+        url: 'https://mykeyvault.vault.azure.net/'
+        secretname: "<name-of-secret>"
+        client_id: "<clientid>"
+        secret: "<secret>"
+        tenant: "<tenantid>"
+      debug: msg="the value of this secret is {{lookup('azure_keyvault_secret',secretname,vault_url=url, client_id=client_id, secret=secret, tenant_id=tenant)}}"
