@@ -1,7 +1,20 @@
 #region Doc
 <#
-	.Synopsis
+	.SYNOPSIS
 		Functions to Ensure AAD Users with auto generating passwords backed in an Azure Key Vault.
+	.DESCRIPTION
+		Customize the follwing functions to tailor your need:
+		1) New-Password:
+		Here I use the pronounceable pattern from the 'https://makemeapassword.ligos.net' api.
+		with two random integers added
+		
+		2) Get-VaultName:
+		some logic to format vault names based on <environment> and <vaultbasename
+		e.g: environment='Development', vaulbasename='covid' => 'kv-mycorp-d-covid'
+		
+		3) Get-ServiceAccountUPN:
+		e.g: $domain = 'mycorp.com', $service = 'service_name', $environment = 'Dev'
+		=> output: svc_d_service_name@mycorp.com
 	
 #>
 #endregion
@@ -117,8 +130,10 @@ $Services = @(
 )
 $envs = @('Dev','Test','Acc','Stage','Prod')
 
+# Creates/updates each service for each environment
 Foreach ($Service in $Services){
     Foreach ($e in $envs) {
+    	# leave out -UpdatePassword if you don't want to update the password if the user exists
         Set-ServiceAccountUser -service $Service.name -environment $e -vaultGroup 'myproduct' -UpdatePassword
     }
 }
