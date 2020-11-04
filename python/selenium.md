@@ -98,3 +98,8 @@ from selenium.webdriver import ActionChains
     actions.move_to_element(elem).perform()
     self.driver.find_element_by_partial_link_text("itemfrom dropdown").click()
 ```
+switch to an iframe
+```
+    iframe = self.driver.find_element_by_id("ifr0")
+    self.driver.switch_to.frame(iframe)
+```
