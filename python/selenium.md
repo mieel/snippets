@@ -89,3 +89,12 @@ class TestClass:
         wait.until(EC.text_to_be_present_in_element((By.ID, "IdOfResultElement"), 'Result'))
 
 ```
+- interact with a dropdown
+```
+from selenium.webdriver import ActionChains
+...
+    actions = ActionChains(self.driver)
+    elem = self.driver.find_element_by_partial_link_text("dropdown")
+    actions.move_to_element(elem).perform()
+    self.driver.find_element_by_partial_link_text("itemfrom dropdown").click()
+```
