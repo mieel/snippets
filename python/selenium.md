@@ -78,3 +78,14 @@ class TestClass:
         actual_href = link.get_attribute('href')
         assert expected_href in actual_href, f"link '{actual_href}' should be '{expected_href}'"
 ```
+
+- Send keys to an inputbox and wait for expected result
+```
+        
+       elem = self.driver.find_element_by_id("IdofElement")
+        elem.send_keys("WAUZZZ8R7AA089479")
+        # wait up to 10 seconds for the expected result
+        wait = WebDriverWait(self.driver, 10)
+        wait.until(EC.text_to_be_present_in_element((By.ID, "IdOfResultElement"), 'Result'))
+
+```
