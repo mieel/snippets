@@ -3,26 +3,47 @@
 ```
 import pytest
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.chrome.options import Options as ChromeOptions
 
 def pytest_addoption(parser):
-    parser.addoption("--username", action="store", default="default name")
-    parser.addoption("--password", action="store", default="default password")
+    parser.addoption("--browser", action="store", default="Chrome")
+    parser.addoption("--headless", action="store", default="No")
+    parser.addoption("--username", action="store")
+    parser.addoption("--userpass", action="store")
+
+@pytest.fixture
+def username(request):
+    return  request.config.getoption("--username")
+
+@pytest.fixture
+def userpass(request):
+    return  request.config.getoption("--userpass")
 
 @pytest.fixture(scope="class")
 def setup(request,base_url):
     # Setup code
-    print("initiating chrome driver")
-    options = Options()
-    options.headless = True
-    driver = webdriver.Chrome() #if not added in PATH
+    requested_browser = request.config.getoption("--browser")
+    requested_headless = request.config.getoption("--headless")
+    if requested_browser.lower() == "firefox":
+        options = FirefoxOptions()
+        if requested_headless.lower() == "yes":
+            options.add_argument("--headless")
+        driver = webdriver.Firefox(options=options)
+    else:
+        options = ChromeOptions()
+        if requested_headless.lower() == "yes":
+            options.add_argument("--headless")
+        driver = webdriver.Chrome(options=options)
     driver.get(base_url)
     driver.implicitly_wait(10)
     request.cls.driver = driver
-    # Start function    
+    # Start function
     yield driver
+
     # Teardown code
     driver.close()
+
 ```
 ## create a test file
 > :warning: **All pytest files, classes, functions should start with test**: Otherwise pytest can't find the test
