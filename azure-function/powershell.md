@@ -1,7 +1,9 @@
 # Read from Blob Input Trigger
-
+```
 $TempFile = New-TemporaryFile
 [io.file]::WriteAllBytes($TempFile.FullName, $InputBlob)
 Write-Host Created Temp File $TempFile.FullName
 $dataSet = Import-Csv $TempFile.FullName -Delimiter ';'
 Write-Host $dataSet.Count lines
+
+```
