@@ -47,13 +47,15 @@ $Query = "
 "
 Invoke-SqlQuery -Query $Query -Database master -ServerInstance $(ServerInstance)
 
+# Pre-seed the ID of the table in case you want to work with multiple databases 
+$Table = $(TableToSeed)
 $YYMM = Get-Date -format "yyMM"
 $Seed = $YYMM + '000000'
-Write-Host 'Seeding Request Table with seed: ' $Seed
+Write-Host 'Seeding $Table Table with seed: ' $Seed
 $Query = "
   --Set Seed to $Seed
   USE [$targetDatabase];
-  DBCC CHECKIDENT (Request, RESEED, $Seed)
+  DBCC CHECKIDENT ($Table, RESEED, $Seed)
 "
 Invoke-SqlQuery -Query $Query -Database master -ServerInstance $(ServerInstance)
 
