@@ -24,8 +24,8 @@ function Get-AppConfigurationKeyValue {
 }
 
 
-$store = 'imb-autoconnect-config'
-$Key = 'Carwizard.Rest.Api.IIS.UserPassword'
+$store = 'mystore'
+$Key = 'mykey'
 (Get-AppConfigurationKeyValue  -Store $store -Key $Key -Label Acceptance).Value
 
 (Get-AppConfigurationKeyValue  -Store $store -Key $Key -Label Acceptance -ResolveSecret).Value
@@ -53,5 +53,5 @@ Measure-Command {
 
 Measure-Command {
     Write-Host 'multi resolved secret'
-    Get-AppConfigurationKeyValue  -Store $store -Key Webdiv* -Label Acceptance -ResolveSecret
+    Get-AppConfigurationKeyValue  -Store $store -Key MyProduct* -Label Acceptance -ResolveSecret
 }
