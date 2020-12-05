@@ -21,6 +21,7 @@ Function Get-CommandHelpExample {
         [string] $Module
     )
     $help = Get-Help $Command -Examples
+    Write-Verbose ($help | Out-String)
     if (-not $help.examples) { return }
     [string]$exampleText = $help.examples[0].example.code
     $exampleText += "`n$($help.examples[0].example.remarks.Text)"
