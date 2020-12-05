@@ -14,11 +14,11 @@ Function Get-CommandHelpExample {
 
           Compare-Object $actualOutput $expectedOutput
     #>
-    param(
-        $module
-        ,
+    param(        
         [parameter(Mandatory=$true)]
-        $Command
+        [string] $Command
+        ,
+        [string] $Module
     )
     $help = Get-Help $Command -Examples
     [string]$exampleText = $help.examples[0].example.code
