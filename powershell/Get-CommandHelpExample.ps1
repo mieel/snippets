@@ -21,7 +21,7 @@ Function Get-CommandHelpExample {
         [string] $Module
     )
     $help = Get-Help $Command -Examples
-    if (-not $help) { return }
+    if (-not $help.examples) { return }
     [string]$exampleText = $help.examples[0].example.code
     $exampleText += "`n$($help.examples[0].example.remarks.Text)"
     [string[]]$strings = $exampleText.split("`n")
