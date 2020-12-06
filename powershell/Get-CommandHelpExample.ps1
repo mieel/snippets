@@ -23,28 +23,30 @@ Function Get-CommandHelpExample {
     $help = Get-Help $Command -Examples
     Write-Verbose ($help | Out-String)
     if (-not $help.examples) { return }
-    [string]$exampleText = $help.examples[0].example.code
-    $exampleText += "`n$($help.examples[0].example.remarks.Text)"
-    [string[]]$strings = $exampleText.split("`n")
-    $exampleScriptblock = $exampleText
-    if ($exampleText -match 'Expected Output') {
-        # Test the code block if Expected Output is specified
-        Write-Verbose "Assertion set for Code"
-        $i = 0
-        $code = @()
-        ForEach ($line in $strings) {
-            Write-Verbose "$i : $line"
-            if ($line -notmatch 'Expected Output') {
-                $code += $line
-                $i++
-            } else {
-                break
+    foreach ($example in $help.examples.example) {
+        [string]$exampleText = $example.code
+        $exampleText += "`n$($example.remarks.Text)"
+        [string[]]$strings = $exampleText.split("`n")
+        $exampleScriptblock = $exampleText
+        if ($exampleText -match 'Expected Output') {
+            # Test the code block if Expected Output is specified
+            Write-Verbose "Assertion set for Code"
+            $i = 0
+            $code = @()
+            ForEach ($line in $strings) {
+                Write-Verbose "$i : $line"
+                if ($line -notmatch 'Expected Output') {
+                    $code += $line
+                    $i++
+                } else {
+                    break
+                }
             }
+            $end = $strings.GetUpperBound(0)+1
+            $assertion = $strings[$i..$end] -join "`n"
+            Write-Verbose $assertion
+            $exampleScriptblock = $Code -join "`n"
         }
-        $end = $strings.GetUpperBound(0)+1
-        $assertion = $strings[$i..$end] -join "`n"
-        Write-Verbose $assertion
-        $exampleScriptblock = $Code -join "`n"
+        Write-Output @{ Scriptblock = $exampleScriptblock  ; Assertion = $assertion.Replace('Expected Output: ','') }
     }
-    Write-Output @{ Scriptblock = $exampleScriptblock  ; Assertion = $assertion.Replace('Expected Output: ','') }
 }
