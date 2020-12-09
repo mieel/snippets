@@ -47,6 +47,9 @@ Function Get-CommandHelpExample {
             Write-Verbose $assertion
             $exampleScriptblock = $Code -join "`n"
         }
-        Write-Output @{ Scriptblock = $exampleScriptblock  ; Assertion = $assertion.Replace('Expected Output: ','') }
+        if ($assertion) {
+            $assertion = $assertion.Replace('Expected Output: ','')
+        }
+        Write-Output @{ Scriptblock = $exampleScriptblock  ; Assertion = $assertion  }
     }
 }
